@@ -4,8 +4,15 @@ from transformers import AutoConfig, AutoModel
 import transformers
 import torch
 from torch import nn
+import pickle
 # from arabert.preprocess import ArabertPreprocessor
 from Mawqifdataset import MawqifDataset
+stance_to_int = {
+  "AGAINST": 0,
+  "FAVOR": 1,
+  "NONE": 2
+}
+int_to_stance = {value: key for key, value in stance_to_int.items()}
 
 class AvgPoolerClassifier(nn.Module):
   def __init__(self, model_name= "UBC-NLP/MARBERT"):
@@ -48,6 +55,10 @@ def avg_pooler_inference(dataset_df, model_path=""):
     embeddings = getOutputEmbeddings(dataset_df)
 
     # TODO: pass embeddings to the model
-
-    return embeddings
+    # The same code can be used for both models
+    with open("models/arabertv02_LOGREG_MODEL.pkl", "rb") as fin:
+        model = pickle.load(fin)
+    y_pred = model.predict(embeddings)
+    y_pred = [int_to_stance[i] for i in y_pred]
+    return y_pred
     
