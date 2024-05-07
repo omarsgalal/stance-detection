@@ -51,12 +51,12 @@ def getOutputEmbeddings(dataset_df, batch_size=1024, model_name="UBC-NLP/MARBERT
       embeddings.append(tempEmbedding)
   return np.concatenate(embeddings, axis=0)
 
-def avg_pooler_inference(dataset_df, model_path=""):
-    embeddings = getOutputEmbeddings(dataset_df)
+def avg_pooler_inference(dataset_df, model_path="models/arabertv02_LOGREG_MODEL.pkl", embedding_model="UBC-NLP/MARBERT"):
+    embeddings = getOutputEmbeddings(dataset_df, model_name=embedding_model)
 
     # TODO: pass embeddings to the model
     # The same code can be used for both models
-    with open("models/arabertv02_LOGREG_MODEL.pkl", "rb") as fin:
+    with open(model_path, "rb") as fin:
         model = pickle.load(fin)
     y_pred = model.predict(embeddings)
     y_pred = [int_to_stance[i] for i in y_pred]

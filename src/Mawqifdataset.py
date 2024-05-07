@@ -6,7 +6,7 @@ from arabert.preprocess import ArabertPreprocessor
 
 
 class MawqifDataset(torch.utils.data.Dataset):
-  def __init__(self, df, tokenizer, model_name, task='stance', is_inference=False):
+  def __init__(self, df, tokenizer, model_name, task='stance', is_inference=False, add_target=False):
     self.labelsIds = {'Neutral': 0, 'Against': 1, 'Favor': 2}
     self.sent_labels = {'Neutral': 0, 'Negative': 1, 'Positive': 2}
     self.task = task
@@ -22,7 +22,10 @@ class MawqifDataset(torch.utils.data.Dataset):
       texts = [arabert_prep.preprocess(t) for t in df['text'].tolist()]
     else:
       texts = df['text'].tolist()
-    self.texts = [tokenizer(self.targets[i], text, padding='max_length', max_length = 128, truncation=True, return_tensors="pt") for i, text in enumerate(texts)]
+    if add_target:
+      self.texts = [tokenizer(self.targets[i], text, padding='max_length', max_length = 128, truncation=True, return_tensors="pt") for i, text in enumerate(texts)]
+    else:
+      self.texts = [tokenizer(text, padding='max_length', max_length = 128, truncation=True, return_tensors="pt") for text in texts]
 
   def classes(self):
     return self.labels

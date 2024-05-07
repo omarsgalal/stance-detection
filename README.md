@@ -1,14 +1,19 @@
 # How to run
 
-1. Download models
+The code was tested on Google Colab. Here are the steps to reproduce the results:
 
-    Change the permission of download_models.sh to be executable Then run the script:
+1. Install requirements
     ```bash
-    chmod +rwx scripts/download_models.sh
-    ./scripts/download_models.sh
+    pip install -r requirements.txt
+    ```
+
+1. Download models
+    ```bash
+    python src/download_models.py
     ```
     
 2. Run inference script to get predictions:
     ```bash
-    python src/inference.py
+    python src/inference.py --dataset_path "datasets/Mawqif_AllTargets_Blind Test.csv" --output_path "predictions.csv"
     ```
+

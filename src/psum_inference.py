@@ -34,14 +34,19 @@ def model_inference(model, test_data, batch_size=16):
   return preds[0]
 
 
-def psum_inference(test_df, model_path="models/psum_twotasks.pth"):
-  model_name = "UBC-NLP/MARBERT"
+def psum_inference(test_df, model_path="models/psum_twotasks.pth", model_name="UBC-NLP/MARBERT"):
   model = PSUMTwoTasksClassifier(model_name,n_layers=4, n_classes_1=3, n_classes_2=3)
   for param in model.bert.parameters():
     param.requires_grad = False
   tokenizer = AutoTokenizer.from_pretrained(model_name)
-  test_dataset = MawqifDataset(test_df, tokenizer, model_name, task='both', is_inference=True)
+  test_dataset = MawqifDataset(test_df, tokenizer, model_name, task='both', is_inference=True, add_target=True)
   model = torch.load(model_path)
   model.eval()
   preds = model_inference(model, test_dataset)
-  return preds
+  stance_to_int = {
+    "AGAINST": 1,
+    "FAVOR": 2,
+    "NONE": 0
+  }
+  int_to_stance = {value: key for key, value in stance_to_int.items()}
+  return [int_to_stance[p] for p in preds]
